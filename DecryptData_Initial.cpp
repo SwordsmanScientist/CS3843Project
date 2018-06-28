@@ -24,6 +24,7 @@ int decryptData(char *data, int dataLength)
 		// (gptrPasswordHash or gPasswordHash), (gptrKey or gkey), gNumRounds
 
 		// simple example that xors 2nd byte of data with 14th byte in the key file
+		/*
 		lea esi,gkey				// put the ADDRESS of gkey into esi
 		mov esi,gptrKey;			// put the ADDRESS of gkey into esi (since *gptrKey = gkey)
 
@@ -48,6 +49,26 @@ int decryptData(char *data, int dataLength)
 		xor byte ptr [edi+1],al		// Exclusive-or the 2nd byte of data with the 14th element of the keyfile
 									// NOTE: Keyfile[14] = 0x21, that value changes the case of a letter and flips the LSB
 									// Lowercase "c" = 0x63 becomes capital "B" since 0x63 xor 0x21 = 0x42
+			*/
+
+		mov ecx, 0
+		mov edi, data
+		//starting_index = gPasswordHash[0] * 256 + gPasswordHash[1];
+		//store starting_index in bl
+		mov al, gPasswordHash[0]
+		mov edx, 256
+		mul edx
+
+		//lea bl, [gPasswordHash[0]*256] //Error here
+		add dl, gPasswordHash[1]
+		LOOP1:
+		add edi, ecx
+			xor byte ptr[edi], dl
+			inc ecx
+			cmp ecx, dataLength
+			jb LOOP1
+
+
 	}
 
 	return resulti;

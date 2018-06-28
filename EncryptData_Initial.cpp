@@ -22,7 +22,7 @@ int encryptData(char *data, int dataLength)
 	__asm {
 		// you will need to reference some of these global variables
 		// (gptrPasswordHash or gPasswordHash), (gptrKey or gkey), gNumRounds
-
+		/*
 		// simple example that xors 2nd byte of data with 14th byte in the key file
 		lea esi,gkey				// put the ADDRESS of gkey into esi
 		mov esi,gptrKey;			// put the ADDRESS of gkey into esi (since *gptrKey = gkey)
@@ -45,9 +45,29 @@ int encryptData(char *data, int dataLength)
 
 		mov al,byte ptr [esi+0xd];			// access 14th byte in gkey[]: 0, 1, 2 ... d is the 14th byte
 		mov edi,data				// Put ADDRESS of first data element into edi
-		xor byte ptr [edi+1],al		// Exclusive-or the 2nd byte of data with the 14th element of the keyfile
+		xor byte ptr [edi+1],al	
+			*/// Exclusive-or the 2nd byte of data with the 14th element of the keyfile
 									// NOTE: Keyfile[14] = 0x21, that value changes the case of a letter and flips the LSB
 									// Capital "B" = 0x42 becomes lowercase "c" since 0x42 xor 0x21 = 0x63
+	mov ecx, 0
+	mov edi, data
+	//starting_index = gPasswordHash[0] * 256 + gPasswordHash[1];
+	//store starting_index in bl
+	mov al, gPasswordHash[0]
+	mov edx, 256
+	mul edx
+
+	//lea bl, [gPasswordHash[0]*256] //Error here
+	add dl, gPasswordHash[1]
+	LOOP1:
+		add edi, ecx
+		xor byte ptr[edi], dl
+		inc ecx
+		cmp ecx, dataLength
+	jb LOOP1
+
+
+
 	}
 
 	return resulti;
